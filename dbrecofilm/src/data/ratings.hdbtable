@@ -1,0 +1,10 @@
+COLUMN TABLE "mlens.dbrecofilm.data::ratings"(
+    "USERID"     INTEGER CS_INT NOT NULL,
+    "MOVIEID"    INTEGER CS_INT NOT NULL,
+    "RATING"     DOUBLE CS_DOUBLE,
+    "TIMESTAMP"  INTEGER,
+    PRIMARY KEY (
+        "USERID", "MOVIEID"
+    )
+)
+COMMENT 'Film ratings data';

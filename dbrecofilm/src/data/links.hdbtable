@@ -1,0 +1,9 @@
+COLUMN TABLE "mlens.dbrecofilm.data::links"(
+    "MOVIEID" INTEGER CS_INT NOT NULL,
+    "IMDBID"  INTEGER CS_INT,
+    "TMDBID"  INTEGER CS_INT,
+    PRIMARY KEY (
+        "MOVIEID"
+    )
+)
+COMMENT 'Film links data';

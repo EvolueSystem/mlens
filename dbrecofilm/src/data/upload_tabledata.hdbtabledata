@@ -1,0 +1,54 @@
+{
+  "format_version": 1,
+  "imports": [
+    {
+      "column_mappings" : { "MOVIEID" : "movieId",        "IMDBID" : "imdbId",        "TMDBID" : "tmdbId"
+      },
+      "import_settings" : {
+        "import_columns" : [ "MOVIEID", "IMDBID", "TMDBID"],
+        "include_filter" : [], "exclude_filter" : []
+      },
+      "source_data" : {
+        "data_type" : "CSV", "has_header" : true, "dialect"   : "HANA",
+        "file_name" : "mlens.dbrecofilm.data::links.csv"
+      },
+      "target_table" : "mlens.dbrecofilm.data::links"  
+    },
+    {
+      "column_mappings" : { "MOVIEID" : "movieId",        "TITLE" : "title",        "GENRES" : "genres"      },
+      "import_settings" : {
+        "import_columns" : [ "MOVIEID", "TITLE", "GENRES"],
+        "include_filter" : [], "exclude_filter" : []
+      },
+      "source_data" : {
+        "data_type" : "CSV", "has_header" : true, "dialect"   : "HANA",
+        "file_name" : "mlens.dbrecofilm.data::movies.csv"
+      },
+      "target_table" : "mlens.dbrecofilm.data::movies"  
+    },
+    {
+      "column_mappings" : { "USERID" : "userId",        "MOVIEID" : "movieId",        "RATING" : "rating",        "TIMESTAMP": "timestamp"      },
+      "import_settings" : {
+        "import_columns" : [ "USERID", "MOVIEID", "RATING", "TIMESTAMP"],
+        "include_filter" : [], "exclude_filter" : []
+      },
+      "source_data" : {
+        "data_type" : "CSV", "has_header" : true, "dialect"   : "HANA",
+        "file_name" : "mlens.dbrecofilm.data::ratings.csv"
+      },
+      "target_table" : "mlens.dbrecofilm.data::ratings"  
+    },
+    {
+      "column_mappings" : { "USERID" : "userId",        "MOVIEID" : "movieId",        "TAG" : "tag",        "TIMESTAMP": "timestamp"      },
+      "import_settings" : {
+        "import_columns" : [ "USERID", "MOVIEID", "TAG", "TIMESTAMP"],
+        "include_filter" : [], "exclude_filter" : []
+      },
+      "source_data" : {
+        "data_type" : "CSV", "has_header" : true, "dialect"   : "HANA",
+        "file_name" : "mlens.dbrecofilm.data::tags.csv"
+      },
+      "target_table" : "mlens.dbrecofilm.data::tags"  
+    }    
+  ]
+}
