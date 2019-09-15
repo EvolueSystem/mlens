@@ -1,0 +1,60 @@
+view "mlens.dbrecofilm.hdb.apl.views::recommendation_collaborative" as
+select
+  userid, rank, t1.movieid, score, title, genres, imdbid, tmdbid
+from (
+  select
+      t1.userid
+    , row_number() over(partition by t1.userid order by t1.score desc, t1.consequent desc ) as rank
+    , t1.consequent as movieid
+    , t1.score      as score
+  from (
+      select
+          t1.userid, t1.consequent, max(t1.score)  as score
+      from (
+        select
+            t1.userid
+          , t1.consequent
+          , t1.support / ( (coalesce (t2_1.count_antecedent,0) + coalesce (t2_2.count_antecedent,0) ) )  as score -- confidence calculation
+        from (
+            select
+                t1.userid
+              , t1.antecedent , t1.consequent
+              , t1.support
+            from (
+              select
+                  spacein.userid
+                , rules.kxnodesecond   as antecedent
+                , rules.kxnodesecond_2 as consequent
+                , rules.weight         as support
+              from "mlens.dbrecofilm.data::ratings" spacein
+              left outer join (select * from "mlens.dbrecofilm.hdb.apl::recommendation.model_links" where graph_name = 'Transactions') products on (products.kxnodefirst  = spacein.userid)
+              left outer join (select * from "mlens.dbrecofilm.hdb.apl::recommendation.model_links" where graph_name = 'Item'        ) rules    on (products.kxnodesecond = rules.kxnodesecond)
+              left outer join (select * from "mlens.dbrecofilm.hdb.apl::recommendation.model_links" where graph_name = 'Transactions') notin    on (rules.kxnodesecond_2  = notin.kxnodesecond) and (notin.kxnodefirst = spacein.userid)
+                where rules.kxnodesecond is not null  and notin.kxnodesecond is null
+            ) t1
+            union all
+            select
+                t1.userid
+              , t1.antecedent , t1.consequent
+              , t1.support
+            from (
+              select
+                  spacein.userid
+                , rules.kxnodesecond_2 as antecedent
+                , rules.kxnodesecond   as consequent
+                , rules.weight         as support
+              from "mlens.dbrecofilm.data::ratings" spacein
+              left outer join (select * from "mlens.dbrecofilm.hdb.apl::recommendation.model_links" where graph_name = 'Transactions') products on (products.kxnodefirst  = spacein.userid)
+              left outer join (select * from "mlens.dbrecofilm.hdb.apl::recommendation.model_links" where graph_name = 'Item'        ) rules    on (products.kxnodesecond = rules.kxnodesecond_2)
+              left outer join (select * from "mlens.dbrecofilm.hdb.apl::recommendation.model_links" where graph_name = 'Transactions') notin    on (rules.kxnodesecond    = notin.kxnodesecond) and (notin.kxnodefirst = spacein.userid)
+              where rules.kxnodesecond_2 is not null and notin.kxnodesecond is null
+            ) t1
+        ) t1
+        left outer join (select kxnodesecond   as antecedent, cast(count(*) as float) as count_antecedent from "mlens.dbrecofilm.hdb.apl::recommendation.model_links" where graph_name ='Transactions' group by kxnodesecond  ) t2_1 on (t1.antecedent = t2_1.antecedent)
+        left outer join (select kxnodesecond_2 as antecedent, cast(count(*) as float) as count_antecedent from "mlens.dbrecofilm.hdb.apl::recommendation.model_links" where graph_name ='Transactions' group by kxnodesecond_2) t2_2 on (t1.antecedent = t2_2.antecedent)
+      ) t1 group by t1.userid,  t1.consequent
+  ) t1
+) t1
+left outer join "mlens.dbrecofilm.data::movies" movies on movies.movieid = t1.movieid
+left outer join "mlens.dbrecofilm.data::links"  links  on links.movieid  = t1.movieid
+where rank <= 5;

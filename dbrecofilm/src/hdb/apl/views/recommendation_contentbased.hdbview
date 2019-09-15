@@ -1,0 +1,48 @@
+view "mlens.dbrecofilm.hdb.apl.views::recommendation_contentbased" as
+select
+  t1.movieid, rank, similar_movie, score, title, genres, imdbid, tmdbid
+from (
+  select
+      t1.movieid
+    , row_number() over(partition by t1.movieid order by t1.score desc, t1.consequent desc ) as rank
+    , t1.consequent as similar_movie
+    , t1.score
+  from (
+      select
+          t1.movieid
+        , t1.consequent
+        , max(t1.score) as score
+      from (
+        select
+            t1.movieid
+          , t1.consequent
+          , t1.support / (coalesce (t2_1.count_antecedent,0) + coalesce (t2_2.count_antecedent,0) ) as score
+        from (
+            select
+                nodes.node as movieid
+              , rules.kxnodesecond   as antecedent
+              , rules.kxnodesecond_2 as consequent
+              , rules.weight as support
+            from
+              "mlens.dbrecofilm.hdb.apl::recommendation.model_node_movie" nodes
+            left outer join (select * from "mlens.dbrecofilm.hdb.apl::recommendation.model_links" where graph_name = 'Item' ) rules    on (nodes.node = rules.kxnodesecond)
+              where rules.kxnodesecond_2 is not null
+            union all
+            select
+                nodes.node as movieid
+              , rules.kxnodesecond_2 as antecedent
+              , rules.kxnodesecond   as consequent
+              , rules.weight as support
+            from
+              "mlens.dbrecofilm.hdb.apl::recommendation.model_node_movie" nodes
+            left outer join (select * from "mlens.dbrecofilm.hdb.apl::recommendation.model_links" where graph_name = 'Item' ) rules    on (nodes.node = rules.kxnodesecond_2)
+            where rules.kxnodesecond is not null
+        ) t1
+        left outer join (select kxnodesecond   as antecedent, cast(count(*) as float) as count_antecedent from "mlens.dbrecofilm.hdb.apl::recommendation.model_links" where graph_name ='Transactions' group by kxnodesecond  ) t2_1 on (t1.antecedent = t2_1.antecedent)
+        left outer join (select kxnodesecond_2 as antecedent, cast(count(*) as float) as count_antecedent from "mlens.dbrecofilm.hdb.apl::recommendation.model_links" where graph_name ='Transactions' group by kxnodesecond_2) t2_2 on (t1.antecedent = t2_2.antecedent)
+      ) t1 group by t1.movieid, t1.consequent
+  ) t1
+) t1
+left outer join "mlens.dbrecofilm.data::movies" movies on movies.movieid = t1.similar_movie
+left outer join "mlens.dbrecofilm.data::links"  links  on links.movieid  = t1.similar_movie
+where rank <= 5;

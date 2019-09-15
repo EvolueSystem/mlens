@@ -1,0 +1,217 @@
+namespace mlens.dbrecofilm.hdb.apl;
+
+context recommendation {
+entity function_header {
+        KEY   : String(50);
+        VALUE : String(255);
+    };
+
+    table type tt_function_header {
+        KEY   : String(50);
+        VALUE : String(255);
+    };
+
+    entity operation_config {
+        KEY   : String(1000);
+        VALUE : String(5000);
+    };
+
+    table type tt_operation_config {
+        KEY   : String(1000);
+        VALUE : String(5000);
+    };
+
+    entity variable_descs {
+        RANK          : Integer;
+        NAME          : String(255);
+        STORAGE       : String(10);
+        VALUETYPE     : String(10);
+        KEYLEVEL      : Integer;
+        ORDERLEVEL    : Integer;
+        MISSINGSTRING : String(255);
+        GROUPNAME     : String(255);
+        DESCRIPTION   : String(255);
+    };
+
+    table type tt_variable_descs {
+        RANK          : Integer;
+        NAME          : String(255);
+        STORAGE       : String(10);
+        VALUETYPE     : String(10);
+        KEYLEVEL      : Integer;
+        ORDERLEVEL    : Integer;
+        MISSINGSTRING : String(255);
+        GROUPNAME     : String(255);
+        DESCRIPTION   : String(255);
+    };
+
+    entity model {
+        NAME       : String(255);
+        VERSION    : Integer;
+        ID         : Integer;
+        PARENTID   : Integer;
+        ENUMFLAG   : Integer;
+        PARAMNAME  : String(255);
+        PARAMTYPE  : String(255);
+        PARAMVALUE : String(255);
+    };
+
+    table type tt_model {
+        NAME       : String(255);
+        VERSION    : Integer;
+        ID         : Integer;
+        PARENTID   : Integer;
+        ENUMFLAG   : Integer;
+        PARAMNAME  : String(255);
+        PARAMTYPE  : String(255);
+        PARAMVALUE : String(255);
+    };
+
+    entity operation_log {
+        OID       : String(50);
+        TIMESTAMP : UTCTimestamp;
+        LEVEL     : Integer;
+        ORIGIN    : String(50);
+        MESSAGE   : LargeString;
+    };
+
+    table type tt_operation_log {
+        OID       : String(50);
+        TIMESTAMP : UTCTimestamp;
+        LEVEL     : Integer;
+        ORIGIN    : String(50);
+        MESSAGE   : LargeString;
+    };
+
+    entity summary {
+        OID   : String(50);
+        KEY   : String(100);
+        VALUE : String(200);
+    };
+
+    table type tt_summary {
+        OID   : String(50);
+        KEY   : String(100);
+        VALUE : String(200);
+    };
+
+    entity indicators {
+        OID      : String(50);
+        VARIABLE : String(255);
+        TARGET   : String(255);
+        KEY      : String(100);
+        VALUE    : LargeString;
+        DETAIL   : LargeString;
+    };
+
+    table type tt_indicators {
+        OID      : String(50);
+        VARIABLE : String(255);
+        TARGET   : String(255);
+        KEY      : String(100);
+        VALUE    : LargeString;
+        DETAIL   : LargeString;
+    };
+    
+    entity mlens_dataset {
+        USERID    : Integer;
+        MOVIEID   : Integer;
+        RATING    : Double;
+        TIMESTAMP : Integer;
+    };
+    
+    table type tt_mlens_dataset {
+        USERID    : Integer;
+        MOVIEID   : Integer;
+        RATING    : Double;
+        TIMESTAMP : Integer;
+    };
+
+    entity model_node_user {
+        NODE : Integer; // must be of the same SQL type as the User column (userId from rating here)
+    };
+
+    table type tt_model_node_user {
+        NODE : Integer; // must be of the same SQL type as the User column (USERID here)
+    };
+
+    entity model_node_movie {
+        NODE : Integer; // must be of the same SQL type as the Item column (movieId from rating  here)
+    };
+
+    table type tt_model_node_movie {
+        NODE : Integer; // must be of the same SQL type as the Item column (MOVIEID here)
+    };
+
+    entity model_links {
+        GRAPH_NAME     : String(255);
+        WEIGHT         : Double;
+        KXNODEFIRST    : Integer; // must be of the same SQL type as the User column (userId from rating  here)
+        KXNODESECOND   : Integer; // must be of the same SQL type as the Item column (movieId from rating  here)
+        KXNODESECOND_2 : Integer; // must be of the same SQL type as the Item column (movieId from rating  here)
+    };
+
+    table type tt_model_links {
+        GRAPH_NAME     : String(255);
+        WEIGHT         : Double;
+        KXNODEFIRST    : Integer;     // must be of the same SQL type as the User column (USERID here)
+        KXNODESECOND   : Integer;     // must be of the same SQL type as the Item column (MOVIEID here)
+        KXNODESECOND_2 : Integer;     // must be of the same SQL type as the Item column (MOVIEID here)
+    };
+
+    entity model_sql_code {
+        OID   : String(50);
+        KEY   : String(100);
+        VALUE : LargeString;
+    };
+
+    table type tt_model_sql_code {
+        OID   : String(50);
+        KEY   : String(100);
+        VALUE : LargeString;
+    };
+    
+    entity mlens_collaborative_result {
+        USERID  : Integer;
+        RANK    : Integer64;
+        MOVIEID : Integer;
+        SCORE   : Double;
+        TITLE   : String(255);
+        GENRES  : String(255);
+        IMDBID  : Integer;
+        TMDBID  : Integer;
+    };
+
+    table type tt_mlens_collaborative_result {
+        USERID  : Integer;
+        RANK    : Integer64;
+        MOVIEID : Integer;
+        SCORE   : Double;
+        TITLE   : String(255);
+        GENRES  : String(255);
+        IMDBID  : Integer;
+        TMDBID  : Integer;
+    };
+    
+    entity mlens_contentbased_result {
+        MOVIEID       : Integer;
+        RANK          : Integer64;
+        SIMILAR_MOVIE : Integer;
+        SCORE         : Double;
+        TITLE         : String(255);
+        GENRES        : String(255);
+        IMDBID        : Integer;
+        TMDBID        : Integer;
+    };
+    
+    table type tt_mlens_contentbased_result {
+        MOVIEID       : Integer;
+        RANK          : Integer64;
+        SIMILAR_MOVIE : Integer;
+        SCORE         : Double;
+        TITLE         : String(255);
+        GENRES        : String(255);
+        IMDBID        : Integer;
+        TMDBID        : Integer;
+    };
+};
